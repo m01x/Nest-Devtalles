@@ -14,13 +14,17 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CarsController = void 0;
 const common_1 = require("@nestjs/common");
+const cars_service_1 = require("./cars.service");
 let CarsController = class CarsController {
-    cars = ['toyota', 'honda', 'hyundai'];
+    carsService;
+    constructor(carsService) {
+        this.carsService = carsService;
+    }
     getAllCars() {
-        return this.cars;
+        return this.carsService.findAll();
     }
     getCarById(id) {
-        return this.cars[id];
+        return this.carsService.findOnById(+id);
     }
 };
 exports.CarsController = CarsController;
@@ -38,6 +42,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CarsController.prototype, "getCarById", null);
 exports.CarsController = CarsController = __decorate([
-    (0, common_1.Controller)('cars')
+    (0, common_1.Controller)('cars'),
+    __metadata("design:paramtypes", [cars_service_1.CarsService])
 ], CarsController);
 //# sourceMappingURL=cars.controller.js.map

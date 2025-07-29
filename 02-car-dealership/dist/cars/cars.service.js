@@ -6,17 +6,35 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CarsModule = void 0;
+exports.CarsService = void 0;
 const common_1 = require("@nestjs/common");
-const cars_controller_1 = require("./cars.controller");
-const cars_service_1 = require("./cars.service");
-let CarsModule = class CarsModule {
+let CarsService = class CarsService {
+    cars = [
+        {
+            id: 1,
+            brand: 'Toyota',
+            model: 'Corolla'
+        },
+        {
+            id: 2,
+            brand: 'Honda',
+            model: 'Civic'
+        },
+        {
+            id: 3,
+            brand: 'Jeep',
+            model: 'OwnJeep'
+        },
+    ];
+    findAll() {
+        return this.cars;
+    }
+    findOnById(id) {
+        return this.cars.find(car => car.id === id);
+    }
 };
-exports.CarsModule = CarsModule;
-exports.CarsModule = CarsModule = __decorate([
-    (0, common_1.Module)({
-        controllers: [cars_controller_1.CarsController],
-        providers: [cars_service_1.CarsService]
-    })
-], CarsModule);
-//# sourceMappingURL=cars.module.js.map
+exports.CarsService = CarsService;
+exports.CarsService = CarsService = __decorate([
+    (0, common_1.Injectable)()
+], CarsService);
+//# sourceMappingURL=cars.service.js.map
