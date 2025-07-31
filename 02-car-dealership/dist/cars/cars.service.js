@@ -30,7 +30,10 @@ let CarsService = class CarsService {
         return this.cars;
     }
     findOnById(id) {
-        return this.cars.find(car => car.id === id);
+        const car = this.cars.find(car => car.id === id);
+        if (!car)
+            throw new common_1.NotFoundException(`Car with id ${id} not found.`);
+        return car;
     }
 };
 exports.CarsService = CarsService;

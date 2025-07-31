@@ -9,5 +9,5 @@ export declare class CarsService {
         id: number;
         brand: string;
         model: string;
-    } | undefined;
+    };
 }

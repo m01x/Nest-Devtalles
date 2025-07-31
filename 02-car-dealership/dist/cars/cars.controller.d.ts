@@ -7,9 +7,15 @@ export declare class CarsController {
         brand: string;
         model: string;
     }[];
-    getCarById(id: string): {
+    getCarById(id: number): {
         id: number;
         brand: string;
         model: string;
-    } | undefined;
+    };
+    createCar(body: any): any;
+    updateCar(id: number, body: any): any;
+    deleteCar(id: number): {
+        method: string;
+        id: number;
+    };
 }
