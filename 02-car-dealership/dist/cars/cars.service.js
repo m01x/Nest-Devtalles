@@ -8,20 +8,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CarsService = void 0;
 const common_1 = require("@nestjs/common");
+const uuid_1 = require("uuid");
 let CarsService = class CarsService {
     cars = [
         {
-            id: 1,
+            id: (0, uuid_1.v4)(),
             brand: 'Toyota',
             model: 'Corolla'
         },
         {
-            id: 2,
+            id: (0, uuid_1.v4)(),
             brand: 'Honda',
             model: 'Civic'
         },
         {
-            id: 3,
+            id: (0, uuid_1.v4)(),
             brand: 'Jeep',
             model: 'OwnJeep'
         },

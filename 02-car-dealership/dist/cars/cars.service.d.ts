@@ -1,13 +1,6 @@
+import { Car } from './interfaces';
 export declare class CarsService {
     private cars;
-    findAll(): {
-        id: number;
-        brand: string;
-        model: string;
-    }[];
-    findOnById(id: number): {
-        id: number;
-        brand: string;
-        model: string;
-    };
+    findAll(): Car[];
+    findOnById(id: string): Car;
 }
