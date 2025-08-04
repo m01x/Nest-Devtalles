@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CarsService } from './cars.service';
+import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('cars')
 export class CarsController {
@@ -20,9 +21,13 @@ export class CarsController {
 
     //...sigamos creando el CRUD?
 
+
+    // una DTO es una clase , Data transfer Object.
+    //El DTO formaliza como voy a mover la data por mi app...
     @Post()
-    createCar( @Body() body: any){
-        return body
+    //@UsePipes( ValidationPipe ) <-- Lo migramos a nivel global de aplicacion
+    createCar( @Body() createCar: CreateCarDto){
+        return createCar
     }
 
     @Patch(':id')
