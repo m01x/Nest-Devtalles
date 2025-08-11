@@ -7,21 +7,11 @@ import { CreateCarDto, UpdteCarDto } from './dto';
 export class CarsService {
 
     private cars: Car[] = [
-        {
-            id:uuidv4(),
-            brand:'Toyota',
-            model:'Corolla'
-        },
-        {
-            id:uuidv4(),
-            brand:'Honda',
-            model:'Civic'
-        },
-        {
-            id:uuidv4(),
-            brand:'Jeep',
-            model:'OwnJeep'
-        },
+        // {
+        //     id:uuidv4(),
+        //     brand:'Toyota',
+        //     model:'Corolla'
+        // }
 
     ];  
 
