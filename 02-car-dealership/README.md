@@ -25,6 +25,23 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+Este proyecto es una API Restful con Mockdata lista para realizar pruebas o implementar para estudiar.
+Los endpoints construidos son los siguientes.
+
+localhost:3000/cars   : Mantiene la logica CRUD de vehiculos
+localhost:3000/brands : Mantiene la logica CRUD de marcas (no hay relación con cars, solo son endpoints demostrativos funcionales)
+localhost:3000/seed   : Si se desea poblar la "base de datos" con información para testing.
+
+El seed ejecuta :
+```bash
+populateDB(){
+
+    this.carsService.fillCarsWithSeedData( CARS_SEED );
+    this.brandsService.fillBrandsWithSeedData( BRANDS_SEED );
+    return 'Seed online!'
+  }
+```
+
 ## Project setup
 
 ```bash
@@ -55,6 +72,12 @@ $ yarn run test:e2e
 
 # test coverage
 $ yarn run test:cov
+```
+
+## Poblar Mock Data (seed)
+```bash
+# Poblar rápidamente la información de prueba.
+$ localhost:3000/seed
 ```
 
 ## Deployment
