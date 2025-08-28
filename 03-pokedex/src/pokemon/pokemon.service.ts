@@ -23,19 +23,15 @@ export class PokemonService {
       return pokemon;
 
     } catch (error) {
-      
-      if (error.code === 11000){
-        throw new BadRequestException(`Pokemon already exist in DB. ${ JSON.stringify( error.keyValue ) }` );
-      }
-
-      console.log(error); //El error no es duplicidad de registros, lanzamos otro error.
-      throw new InternalServerErrorException(`Can't create Pokemon - Check server logs`);
+      this.handleExceptions(error);
 
     }
 
 
   }
 
+  //TODO:Hacer las paginaciones y hay que cargar la bd con mas registros
+  
   findAll() {
     return `This action returns all pokemon`;
   }
@@ -66,11 +62,61 @@ export class PokemonService {
     return pokemon;
   }
 
-  update(id: number, updatePokemonDto: UpdatePokemonDto) {
-    return `This action updates a #${id} pokemon`;
+  async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+    try {
+
+      const pokemon = await this.findOne( term ); //Buscamos el pokemon a editar, el term viene en la url.
+
+      /**
+       * El updatePokemonDto es el body de la solicitud... se formatea con el dto
+       * y es en cuestion el objeto que va a modificar la BD
+       */
+
+      if (!updatePokemonDto) throw new BadRequestException('No data provided to update');
+      if ( updatePokemonDto.name) updatePokemonDto.name = updatePokemonDto.name.toLowerCase(); //se normaliza el nombre que llega a minuscula
+
+      await pokemon.updateOne( updatePokemonDto, { new: true } );
+
+      return {...pokemon.toJSON(), ...updatePokemonDto};
+      
+    } catch (error) {
+
+      this.handleExceptions(error);
+    }
+
+    
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pokemon`;
+  async remove(id: string) {
+    // const pokemon = await this.findOne(id); //Buscamos el pkm
+    // await pokemon.deleteOne(); //pum, lo entregamos al delete...
+
+    // const result = await this.pokemonModel.findByIdAndDelete( id );
+
+    //! CUIDADO CON this.pokemonModel.deleteMany() porque equivale a un DELETE * FROM pokemon
+    const { deletedCount } = await this.pokemonModel.deleteOne( { _id: id } );
+
+    if( deletedCount === 0 ){
+      throw new BadRequestException(`Pokemon with id "${ id }" not found`)
+    }
+    return;
   }
+
+  /**
+   * * ***************************
+   * ?🐈🌺🌈Custom Functions ****
+   * * ***************************
+   * @param error
+   */
+
+  private handleExceptions( error: any){
+    if (error.code === 11000){
+        throw new BadRequestException(`ERROR: El ID. ${ JSON.stringify( error.keyValue ) } ya se encuentra en uso` );
+      }
+
+      console.log(error); //El error no es duplicidad de registros, lanzamos otro error.
+      throw new InternalServerErrorException(`Can't update Pokemon - Check server logs`);
+  }
+
+  
 }
