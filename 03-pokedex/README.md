@@ -36,7 +36,12 @@ npm i -g @nestjs/cli
 ```
 > *Esto es muy util para poder instalar resources completos! (CRUD completo incluido)*
 
-4. Levantar Base de datos:
+4. Levantar la aplicación
+```
+yarn run start:dev
+```
+
+5. Levantar Base de datos:
 ```
 docker-compose up -d
 ```
@@ -44,3 +49,27 @@ docker-compose up -d
 ## Stack utilizado
 * Mongo
 * Nest (ts)
+
+
+## 🚨 Consideraciones
+
+
+**Axios**
+
+
+En la última versión del mismo, está dando inconvenientes con NestJS (cannot read properties of undefined).
+
+Pueden ver la issue sin resolver a día de hoy: https://github.com/axios/axios/issues/5100.
+
+
+
+Por lo que a la hora de instalar axios, recomendamos instalar la versión 0.27.2 hasta que liberen una versión superior con el inconveniente solventado, o por lo menos en el uso de este proyecto.
+
+Puedes usar el comando
+``` 
+yarn add axios@0.27.2
+```
+ o 
+```
+npm install axios@0.27.2.
+```
