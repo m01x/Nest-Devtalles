@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { PokeResponse } from './interfaces/poke-response.interface';
+import { CreatePokemonDto } from 'src/pokemon/dto/create-pokemon.dto';
 
 @Injectable()
 export class SeedService {
@@ -9,17 +10,28 @@ export class SeedService {
   
   async executeSeed(){
 
-    const { data } = await this.axios.get<PokeResponse>(`https://pokeapi.co/api/v2/pokemon?limit=5`);
+    let registros: Array<CreatePokemonDto>;
 
-    //Vamos a extraer la data.
 
-    data.results.forEach(({name, url})=>{
+    try {
+      const { data } = await this.axios.get<PokeResponse>(`https://pokeapi.co/api/v2/pokemon?limit=5`);
 
-      const segments = url.split('/'); //[ 'https:', '', 'pokeapi.co', 'api', 'v2', 'pokemon', '1', '' ]
+
+      data.results.forEach(({name, url})=>{
+
+        const segments = url.split('/'); //[ 'https:', '', 'pokeapi.co', 'api', 'v2', 'pokemon', '1', '' ]
+        const no : number = +segments[ segments.length -2]; //* Quiero la penultima posición.
+
+        registros.push({name,no});
       
-      const no:number = +segments[ segments.length -2]; //* Quiero la penultima posición.
+      });
       
-    })
-    return data.results;
+      return registros;
+      
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+
   }
 }
