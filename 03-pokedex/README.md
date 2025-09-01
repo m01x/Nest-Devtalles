@@ -46,6 +46,12 @@ yarn run start:dev
 docker-compose up -d
 ```
 
+6. Reconstruir base de datos con los primeros 650 pokemons, visitar el sgte endpoint.
+```
+http://localhost:3000/api/v2/seed
+``` 
+_esto  hara un wipe de la bd y re-ingresara 650 pokemones para pruebas._
+
 ## Stack utilizado
 * Mongo
 * Nest (ts)
