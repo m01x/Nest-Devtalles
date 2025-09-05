@@ -46,7 +46,10 @@ yarn run start:dev
 docker-compose up -d
 ```
 
-6. Reconstruir base de datos con los primeros 650 pokemons, visitar el sgte endpoint.
+6. Clonar el archivo __.env.template__ y renombrar a __.env__ con los parametros correctos para levantar la aplicacion.
+
+
+7. SEED: Reconstruir base de datos con los primeros 650 pokemons, visitar el sgte endpoint.
 ```
 http://localhost:3000/api/v2/seed
 ``` 
