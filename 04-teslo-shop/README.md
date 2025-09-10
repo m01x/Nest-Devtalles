@@ -45,8 +45,22 @@ $ yarn run start:prod
 ```
 
 # Teslo API
+*Proyecto de API RESTfull utilizando __TypeORM__ , __Postgres__ con __NestJS__*
 
-1. Levantar la BD
+
+
+1. Clonar proyecto.
+2. Instalar dependencias
+```
+yarn install
+```
+3. Clonar el archivo ```.env.template``` y renombrarlo por ```.env```.
+4. Modificar las variables de entorno del archivo ```.env```
+5. Levantar la base de datos
 ```
 docker-compose up -d
+```
+6. Iniciar proyecto
+```
+yarn start:dev
 ```
