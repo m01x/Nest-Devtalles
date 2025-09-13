@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,                  //! No queremos que el ORM mute la BD en producción, pero por ahora se dejara asi.
-    })
+    }),
+    ProductsModule
   ],
 })
 export class AppModule {
