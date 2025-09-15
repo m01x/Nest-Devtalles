@@ -31,7 +31,7 @@ export class CreateProductDto {
     @IsInt()
     @IsPositive()
     @IsOptional()
-    stock?: string;
+    stock?: number;
 
     @IsString({ each: true})
     @IsArray()
