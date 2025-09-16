@@ -1,4 +1,6 @@
 import {
+    BeforeInsert,
+    BeforeUpdate,
     Column, 
     Entity, 
     PrimaryGeneratedColumn 
@@ -49,5 +51,20 @@ export class Product {
     
     //tags
     //images
+
+    @BeforeInsert()
+    checkSlugInsert(){
+
+        if(!this.slug) {
+            this.slug = this.title;
+        } 
+
+        this.slug = this.slug
+            .toLowerCase()
+            .replace(" ","_")
+            .replace("'","");
+    }
+
+    //@BeforeUpdate()
 
 }
