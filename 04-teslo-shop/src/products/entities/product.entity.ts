@@ -49,22 +49,32 @@ export class Product {
     gender: string;
 
     
-    //tags
+    @Column('text',{
+        array: true,
+        default: []
+    })
+    tags: string[]
     //images
 
     @BeforeInsert()
-    checkSlugInsert(){
+    checkSlugInsert() {
 
-        if(!this.slug) {
+        if (!this.slug) {
             this.slug = this.title;
-        } 
+        }
 
         this.slug = this.slug
             .toLowerCase()
-            .replace(" ","_")
-            .replace("'","");
+            .replaceAll(' ', '_')
+            .replaceAll("'", '');
     }
 
-    //@BeforeUpdate()
+    @BeforeUpdate()
+    checkSlugUpdate() {
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ', '_')
+            .replaceAll("'", '');
+    }
 
 }

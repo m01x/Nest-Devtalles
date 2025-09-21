@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -6,6 +6,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 import { Product } from './entities/product.entity';
 import { isMongoId, isUUID } from 'class-validator';
+import { PaginationDTO } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class ProductsService {
@@ -46,8 +47,14 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return this.productRepository.find();
+  findAll(paginationDto: PaginationDTO) {
+
+    const { limit = 10, offset = 0 } = paginationDto;
+    return this.productRepository.find({
+      take: limit,
+      skip: offset,
+      //TODO: RELACIONES.
+    });
   }
 
   async findOne(term: string) {
@@ -59,18 +66,45 @@ export class ProductsService {
     if( isUUID(term)){
 
       producto = await this.productRepository.findOneBy({ id: term });
-      return producto;
 
     }else{
-
-      producto = await this.productRepository.findOneBy({slug: term});
-      return producto;
+      /**
+       * ?      Con query builders podemos elaborar sentencias SQL mas completas, como en este caso:
+       * *      SELECT * FROM product WHERE slug = xxxx OR title = XXXX limit 1
+       */
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      producto = await queryBuilder
+        .where('UPPER(title) = :title OR slug = :slug', {
+          title: term.toUpperCase(),
+          slug: term.toLowerCase(),
+        }).getOne();
     }
-    throw new BadRequestException('El termino de búsqueda no es ni un UUID o un slug')
+
+    if( !producto )
+    throw new NotFoundException(`No se encontro producto con el termino: ${ term }`);
+
+    return producto;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+
+    //* Busca un producto por el ID y adicionalmente carga todas las propiedades que esten en este updateProductDto
+    const product = await this.productRepository.preload({
+      id: id,
+      ...updateProductDto
+    });
+
+    if ( !product ) throw new NotFoundException(`Product ID: ${id} , not found.`);
+
+    try {
+
+        await this.productRepository.save( product );
+        return product;
+      
+    } catch (error) {
+      this.handleDBExceptionsLogger(error);
+    }
+
   }
 
   async remove(id: string) {
