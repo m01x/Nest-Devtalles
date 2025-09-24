@@ -4,9 +4,10 @@ import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
-import { Product } from './entities/product.entity';
 import { isMongoId, isUUID } from 'class-validator';
 import { PaginationDTO } from 'src/common/dtos/pagination.dto';
+
+import { ProductImage, Product } from './entities';
 
 @Injectable()
 export class ProductsService {
@@ -19,9 +20,12 @@ export class ProductsService {
 
   constructor(
 
+    
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
 
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>,
   ){}
 
 
@@ -37,24 +41,36 @@ export class ProductsService {
         createProductDto.slug = createProductDto.slug.toLowerCase().replace(" ","_").replace("'","");
       } */
 
-      const product = this.productRepository.create(createProductDto); 
+      const { images = [], ...productDetails} = createProductDto;
+
+      const product = this.productRepository.create({
+        ...productDetails,
+      images: images.map( image => this.productImageRepository.create({ url: image }))
+      }); 
       await this.productRepository.save( product )
 
-      return product;
+      return {...product, images};
       
     } catch (error) {
       this.handleDBExceptionsLogger(error)
     }
   }
 
-  findAll(paginationDto: PaginationDTO) {
+  async findAll(paginationDto: PaginationDTO) {
 
     const { limit = 10, offset = 0 } = paginationDto;
-    return this.productRepository.find({
+    const products = await this.productRepository.find({
       take: limit,
       skip: offset,
-      //TODO: RELACIONES.
+      relations: {
+        images: true
+      }
     });
+
+    return products.map( (product) => ({
+      ...product,
+      images: product.images?.map(img => img.url)
+    }))
   }
 
   async findOne(term: string) {
@@ -89,10 +105,10 @@ export class ProductsService {
   async update(id: string, updateProductDto: UpdateProductDto) {
 
     //* Busca un producto por el ID y adicionalmente carga todas las propiedades que esten en este updateProductDto
-    const product = await this.productRepository.preload({
+    /*  const product = await this.productRepository.preload({
       id: id,
       ...updateProductDto
-    });
+    }); 
 
     if ( !product ) throw new NotFoundException(`Product ID: ${id} , not found.`);
 
@@ -104,6 +120,7 @@ export class ProductsService {
     } catch (error) {
       this.handleDBExceptionsLogger(error);
     }
+      */
 
   }
 

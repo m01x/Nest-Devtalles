@@ -61,9 +61,9 @@ export class Product {
     @OneToMany(
         ()=> ProductImage,                              //Entidad o tabla a relacionar
         ( productImage ) => productImage.product,       //Relacion de campos
-        { cascade:  true }
+        { cascade:  true, eager: true }                 //Eager funciona tipo "inner join", leftJoin, etc
     )
-    images?:    ProductImage;
+    images?:    ProductImage[];
 
     @BeforeInsert()
     checkSlugInsert() {
