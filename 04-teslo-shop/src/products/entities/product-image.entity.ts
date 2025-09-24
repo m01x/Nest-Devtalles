@@ -12,7 +12,8 @@ export class ProductImage {
 
     @ManyToOne(
         ()=> Product, //tabla o entidad a relaiconar
-        ( product ) => product.images //relacion de campos.
+        ( product ) => product.images, //relacion de campos.
+        { onDelete: 'CASCADE'}
     )
     product: Product;
 }

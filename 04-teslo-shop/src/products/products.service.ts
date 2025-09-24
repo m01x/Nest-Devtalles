@@ -182,4 +182,20 @@ export class ProductsService {
 
     throw new InternalServerErrorException('Error inesperado [fn: handleDBExceptionsLogger]: Consulte los server logs')
   }
+
+  async deleteAllProducts(){
+
+    const query = this.productRepository.createQueryBuilder('product');
+
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+      
+    } catch (error) {
+      this.handleDBExceptionsLogger(error);
+    }
+  }
+
 }
