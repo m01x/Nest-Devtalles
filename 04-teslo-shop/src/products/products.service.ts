@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -26,6 +26,8 @@ export class ProductsService {
 
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
+
+    private readonly dataSource: DataSource,
   ){}
 
 
@@ -88,12 +90,14 @@ export class ProductsService {
        * ?      Con query builders podemos elaborar sentencias SQL mas completas, como en este caso:
        * *      SELECT * FROM product WHERE slug = xxxx OR title = XXXX limit 1
        */
-      const queryBuilder = this.productRepository.createQueryBuilder();
+      const queryBuilder = this.productRepository.createQueryBuilder('prod');
       producto = await queryBuilder
         .where('UPPER(title) = :title OR slug = :slug', {
           title: term.toUpperCase(),
           slug: term.toLowerCase(),
-        }).getOne();
+        })
+        .leftJoinAndSelect('prod.images','prodImages')
+        .getOne();
     }
 
     if( !producto )
@@ -102,25 +106,59 @@ export class ProductsService {
     return producto;
   }
 
+  async findOnePlain( term: string ){
+    const { images = [] , ...rest } = await this.findOne(term);
+    return {
+      ...rest,
+      images: images.map( image => image.url)
+    }
+  }
+
   async update(id: string, updateProductDto: UpdateProductDto) {
 
+    const { images, ...restToUpdate } = updateProductDto
+
     //* Busca un producto por el ID y adicionalmente carga todas las propiedades que esten en este updateProductDto
-    /*  const product = await this.productRepository.preload({
-      id: id,
-      ...updateProductDto
-    }); 
+      const product = await this.productRepository.preload({ id: id,...restToUpdate }); 
 
     if ( !product ) throw new NotFoundException(`Product ID: ${id} , not found.`);
 
+    //Create Query Runner .
+    const queryRunner = this.dataSource.createQueryRunner(); //Con esto haremos varios pasos... Definiremos una serie de procedimientos.
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+
     try {
 
-        await this.productRepository.save( product );
-        return product;
+      if( images ){
+
+        await queryRunner.manager.delete(ProductImage, { product: { id: id } });
+
+        product.images = images.map(
+          image => this.productImageRepository.create({ url: image})
+        )
+      } else {
+
+      }
+
+        await queryRunner.manager.save( product );
+        //await this.productRepository.save( product ); Outdated, mejoramos la actualizacion con el uso de Query Runner
+
+        //* Consolidamos los cambios
+        await queryRunner.commitTransaction();
+        await queryRunner.release();
+
+        return this.findOnePlain(id);
       
     } catch (error) {
+
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       this.handleDBExceptionsLogger(error);
+
     }
-      */
+      
 
   }
 
