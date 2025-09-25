@@ -60,7 +60,11 @@ yarn install
 ```
 docker-compose up -d
 ```
-6. Iniciar proyecto
+6. Insertar Seed
+```
+{host}:{port}/api/seed
+```
+7. Iniciar proyecto
 ```
 yarn start:dev
 ```

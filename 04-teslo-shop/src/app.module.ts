@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { CommonModule } from './common/common.module';
       synchronize: true,                  //! No queremos que el ORM mute la BD en producción, pero por ahora se dejara asi.
     }),
     ProductsModule,
-    CommonModule
+    CommonModule,
+    SeedModule
   ],
   providers: [],
 })
