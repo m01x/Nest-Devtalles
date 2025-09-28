@@ -1,12 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Param, UploadedFile, UseInterceptors, BadRequestException, Res } from '@nestjs/common';
+import express from 'express';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
+import { fileNamer } from './helpers/fileNamer.helper';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+
+  //*Inyecciones, constructor
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly configService: ConfigService 
+  ) {}
 
   /**
    * Esto lo que hace es lo siguiente:
@@ -28,17 +36,41 @@ export class FilesController {
     fileFilter: fileFilter, //Mandamos solo la referencia!! no la ejecutamos fileFilter() ✖️
     //limits: { fileSize: 1000 },
     storage: diskStorage({
-      destination: './files/uploads'
+      destination: './static/products',
+      filename: fileNamer
     })
   }) )
-  uploadProductImage( 
+  async uploadProductImage( 
     @UploadedFile() file: Express.Multer.File 
   ){
     if ( !file ){
       throw new BadRequestException('Asegurate que el archivo sea una imagen.')
     }
+
+    const secureUrl = `${ this.configService.get('HOST_API') }/static/products/${ file.filename }`;
     return {
-      fileName: file.originalname
+      secureUrl
     };
+  }
+
+
+  @Get('product/:imageName')
+  findProductImage( 
+    @Res() res: express.Response, //Este decorador interrumpe la respuesta. Uno le dice a Nest que uno se hara cargo de procesar la respuesta.
+    @Param('imageName') imageName: string
+  ){
+
+    const path = this.filesService.getStaticProductImage( imageName );
+
+    /*
+    !Ejemplo de respuesta custom con el red
+    res.status(403).json({
+      ok: false,
+      path: path
+    })
+      */
+
+    res.sendFile( path );
+
   }
 }
