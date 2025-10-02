@@ -37,7 +37,7 @@ export class AuthService {
 
       return {
         ...restUserData,
-        token: this.getJwtToken({ email: user.email })
+        token: this.getJwtToken({ id: restUserData.id })
       };
       //TODO retornar el JWT de acceso.
 
@@ -55,7 +55,7 @@ export class AuthService {
 
       const user = await this.userRepository.findOne({
          where: { email },
-         select: {email: true, password: true}
+         select: {email: true, password: true, id: true}
       
         });
 
@@ -69,7 +69,7 @@ export class AuthService {
 
       return {
         ...safeUserInfo,
-        token: this.getJwtToken({ email: user.email })
+        token: this.getJwtToken({ id: user.id })
       };
       
     } catch (error) {
