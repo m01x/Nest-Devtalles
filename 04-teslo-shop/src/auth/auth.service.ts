@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -7,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
@@ -35,7 +35,10 @@ export class AuthService {
       
       const { password : hidePass, ...restUserData} = user;
 
-      return restUserData;
+      return {
+        ...restUserData,
+        token: this.getJwtToken({ email: user.email })
+      };
       //TODO retornar el JWT de acceso.
 
     } catch (error) {
@@ -62,11 +65,15 @@ export class AuthService {
         if( !bcrypt.compareSync( password, user.password) ) //Esto comparara la contraseña que le ingresamos por POST, comparara el hash con la que tenemos almacenada.
           throw new UnauthorizedException('Credentials are not valid (wrong password)')
 
-          
-      return user;
+      const { password:_ignored, ...safeUserInfo } = user;
+
+      return {
+        ...safeUserInfo,
+        token: this.getJwtToken({ email: user.email })
+      };
       
     } catch (error) {
-      console.log(error)
+      this.handleErrors(error)
     }
 
   }
@@ -74,6 +81,11 @@ export class AuthService {
 
   private getJwtToken( payload: JwtPayload ){
     //Para generar el jwt, debemos proveer un servicio que ya tenemos... lo inyectaremos en el constructor
+
+    const token = this.jwtService.sign( payload );
+
+    return token;
+
   }
   
 
@@ -86,8 +98,10 @@ export class AuthService {
 
     if ( error.code === '23505') throw new BadRequestException( error.detail );
 
-    console.log(error);
+    //! Esto va para la consola de nest, con todo detalle del error.
+    console.log(error); 
 
+    //! Esto va para postman o el frontend... es para no exponer tanta info.
     throw new InternalServerErrorException('Please check server errors⚠️');
   }
 }
