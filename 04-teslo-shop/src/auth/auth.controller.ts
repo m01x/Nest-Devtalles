@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
-import { GetUser, RawHeaders, RoleProtected } from './decorators';
+import { Auth, GetUser, RawHeaders, RoleProtected } from './decorators';
 import { UserRoleGuard } from './guards/user-role/user-role.guard';
 import { ValidRoles } from './interfaces';
 
@@ -42,12 +42,39 @@ export class AuthController {
   //Para fines educativos, para el uso de los guards
   //@SetMetadata('roles',['admin', 'super-user'])
   @Get('private2')
-  @RoleProtected()
+  @RoleProtected( ValidRoles.superUser, ValidRoles.admin)
   @UseGuards( AuthGuard(), UserRoleGuard )
-  privateRoute2 (){
+  privateRoute2 (
+    @GetUser() user:User
+  ){
 
     return {
       ok: true,
+      user
+    }
+  }
+
+  /**
+   * Version final, de una ruta protegida.
+   * Esto sera realizado por un custom decorator.
+   * https://cursos.devtalles.com/courses/take/nest/lessons/37024973-composicion-de-decoradores
+   * 
+   * Ahora, si queremos restringir una ruta, simplemente enviar el rol al Auth, ej
+   * RUTA SOLO ADMINS = @Auth( ValidRoles.admin )
+   * Vayan todos los autenticados = @Auth()
+   * 
+   * Me quito el sombrero en esta parte, si llegas a olvidarlo, REPASA LA CLASE, quedan faciles las sessions asi!
+   */
+
+  @Get('private3')
+  @Auth()
+  privateRoute3 (
+    @GetUser() user:User
+  ){
+
+    return {
+      ok: true,
+      user
     }
   }
 
