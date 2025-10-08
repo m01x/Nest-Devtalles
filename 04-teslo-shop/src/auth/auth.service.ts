@@ -77,6 +77,14 @@ export class AuthService {
 
   }
 
+  async checkAuthStatus( user : User){
+
+    return {
+      ...user,
+      token: this.getJwtToken( {id: user.id} )
+    }
+  }
+
 
   private getJwtToken( payload: JwtPayload ){
     //Para generar el jwt, debemos proveer un servicio que ya tenemos... lo inyectaremos en el constructor
